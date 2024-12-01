@@ -6,8 +6,6 @@ import (
 	"math"
 	"os"
 	"sort"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -18,7 +16,6 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	// scanner.Split(bufio.ScanWords)
 
 	left := []int{}
 	right := []int{}
@@ -27,29 +24,26 @@ func main() {
 	result_2 := 0
 
 	for scanner.Scan() {
-		line := scanner.Text()
-		words := strings.Fields(line)
 
-		num_left, _ := strconv.Atoi(words[0])
-		num_right, _ := strconv.Atoi(words[1])
+		var num_left, num_right int
+		fmt.Sscanf(scanner.Text(), "%d %d", &num_left, &num_right)
 
 		left = append(left, num_left)
 		right = append(right, num_right)
-
 	}
 
 	//part 1
 	sort.Ints(left)
 	sort.Ints(right)
 
-	for i := 0; i < len(left); i++ {
+	for i := range left {
 		result_1 += int(math.Abs(float64(left[i] - right[i])))
 	}
 
 	fmt.Printf("result 1: %v\n", result_1)
 
 	// part 2
-	frequency := make(map[int]int)
+	frequency := make(map[int]int, 300)
 	for _, num := range right {
 		frequency[num]++
 	}
