@@ -6,6 +6,8 @@ import (
 	"math"
 	"os"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -26,7 +28,11 @@ func main() {
 	for scanner.Scan() {
 
 		var num_left, num_right int
-		fmt.Sscanf(scanner.Text(), "%d %d", &num_left, &num_right)
+		// fmt.Sscanf(scanner.Text(), "%d %d", &num_left, &num_right)
+		test := strings.Fields(scanner.Text())
+
+		num_left, _ = strconv.Atoi(test[0])
+		num_right, _ = strconv.Atoi(test[1])
 
 		left = append(left, num_left)
 		right = append(right, num_right)
