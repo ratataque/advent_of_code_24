@@ -14,7 +14,7 @@ func sumMul(input string) int {
 	bytes := []byte(input)
 	// fmt.Printf("bytes: %v\n", bytes)
 
-	for i := 1; i < len(bytes)-8; i++ {
+	for i := 0; i < len(bytes)-8; i++ {
 		// Check for 'mul('
 		if bytes[i] == 'm' &&
 			bytes[i+1] == 'u' &&
@@ -64,8 +64,9 @@ func sumMul(input string) int {
 
 			// check for closing parenthesis
 			if numStart < len(bytes) && bytes[numStart] == ')' {
-				fmt.Printf("num1: %v\n", num1)
-				fmt.Printf("num2: %v\n", num2)
+				// fmt.Printf("num1: %v\n", num1)
+				// fmt.Printf("num2: %v\n", num2)
+				// println(num1, num2)
 				total += num1 * num2
 			}
 		}
@@ -77,11 +78,11 @@ func regSumMul(input_string string) int {
 	reg := regexp.MustCompile(`mul\((\d{1,3}),(\d{1,3})\)`)
 
 	matches := reg.FindAllStringSubmatch(input_string, -1)
-
 	result_1 := 0
 	for _, match := range matches {
 		x, _ := strconv.Atoi(match[1])
 		y, _ := strconv.Atoi(match[2])
+		// println(x, y)
 		result_1 += x * y
 	}
 	return result_1
@@ -95,20 +96,21 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	result_1 := 0
+	// reg_result_tot_1 := 0
+	bytes_result_tot_1 := 0
 	for scanner.Scan() {
 		input_string := scanner.Text()
 
-		result_1 = regSumMul(input_string)
+		// reg_result_tot_1 += regSumMul(input_string)
 
-		// result_1 = sumMul(input_string)
-		// fmt.Printf("matches: %q\n", matches)
+		bytes_result_tot_1 += sumMul(input_string)
 	}
 
 	//part 1
 
 	// fmt.Printf("numbers: %#v\n", final_list)
-	fmt.Printf("result 1: %v\n", result_1)
+	// fmt.Printf("result 1: %v\n", reg_result_tot_1)
+	fmt.Printf("result 1: %v\n", bytes_result_tot_1)
 
 	// part 2
 	// fmt.Printf("result 2: %v\n", almostSafeReports)
