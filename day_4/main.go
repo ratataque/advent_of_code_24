@@ -35,19 +35,18 @@ func sumXMAS(bytes []byte) int {
 			x_max := j + (3 * dir[0])
 			y_max := i + (3 * dir[1] * line_len)
 			if x_max >= 0 && x_max < line_len && y_max >= 0 {
-				println(i, j, x_max, y_max)
+				// println(i, j, x_max, y_max)
 
-				// if (bytes[j+i] == 'X' &&
+				// if (bytes[j+(0*dir[0])+i+(0*dir[1]*line_len)] == 'X' &&
 				// 	bytes[j+(1*dir[0])+i+(1*dir[1]*line_len)] == 'M' &&
 				// 	bytes[j+(2*dir[0])+i+(2*dir[1]*line_len)] == 'A' &&
 				// 	bytes[j+(3*dir[0])+i+(3*dir[1]*line_len)] == 'S') ||
-				if bytes[j+i] == 'S' &&
-					bytes[j+(1*dir[0])+i+(1*dir[1]*line_len)] == 'A' &&
-					bytes[j+(2*dir[0])+i+(2*dir[1]*line_len)] == 'M' &&
-					bytes[j+(3*dir[0])+i+(3*dir[1]*line_len)] == 'X' {
+				if bytes[j*(0*dir[0])+i*(0*dir[1]*line_len)] == 'S' &&
+					bytes[j*(1*dir[0])+i*(1*dir[1]*line_len)] == 'A' &&
+					bytes[j*(2*dir[0])+i*(2*dir[1]*line_len)] == 'M' &&
+					bytes[j*(3*dir[0])+i*(3*dir[1]*line_len)] == 'X' {
 					total_xmas += 1
-					// println(j+i, j+(1*dir[0])+i+(1*dir[1]*line_len), j+(2*dir[0])+i+(2*dir[1]*line_len), j+(3*dir[0])+i+(3*dir[1]*line_len))
-					// fmt.Printf("bytes: %q\n", bytes[j+i])
+					// println(j+(0*dir[0])+i+(0*dir[1]*line_len), j+(1*dir[0])+i+(1*dir[1]*line_len), j+(2*dir[0])+i+(2*dir[1]*line_len), j+(3*dir[0])+i+(3*dir[1]*line_len))
 					// println(i, bytes[i])
 				}
 			}
