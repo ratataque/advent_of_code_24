@@ -70,8 +70,7 @@ func main() {
 	for y := 0; y < len(file); y++ {
 		for x := 0; y < len(file); y, x = y+1, x+1 {
 			if file[y] == '^' {
-				starting_pos = []int{x, (y/len(lines[0]) - 1)}
-				// println("found")
+				starting_pos = []int{x, y / len(lines[0])}
 			}
 
 			if file[y] == '\n' {
