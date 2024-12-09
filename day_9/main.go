@@ -33,31 +33,6 @@ func parseDiskMap(input []byte) ([]int, [][]int) {
 	return string, files
 }
 
-func parseDiskMap2(input []byte) []int {
-	var string []int
-	fileID := 0
-	for i, char := range input {
-		n := int(char - '0')
-
-		if i%2 == 1 {
-			sub := []int{}
-			for j := 0; j < n; j++ {
-				sub = append(sub, -1)
-			}
-			string = append(string, sub...)
-			fileID++
-
-		} else {
-			sub := []int{}
-			for j := 0; j < n; j++ {
-				sub = append(sub, fileID)
-			}
-			string = append(string, sub...)
-		}
-	}
-	return string
-}
-
 func main() {
 	start := time.Now()
 	file, _ := os.ReadFile("day_9/input.txt")
@@ -85,21 +60,65 @@ func main() {
 		}
 	}
 
-	result_1 := 0
+	// Part 2
+	for i := len(files) - 1; i > 0; i-- {
+		count := 0
+		last_gap_len := 0
+		for j, c := range disk_map2 {
+			if c == i {
+				break
+			}
+
+			if c == -1 {
+				count++
+				if disk_map2[j+1] != -1 {
+					last_gap_len = count
+					j++
+					count = 0
+				}
+			}
+
+			if len(files[i]) <= last_gap_len {
+				v := last_gap_len - len(files[i])
+				new_file := []int{}
+
+				new_file = append(new_file, files[i]...)
+				for k := 0; k < v; k++ {
+					new_file = append(new_file, -1)
+				}
+
+				for k := 0; k < len(disk_map2); k++ {
+					if disk_map2[k] == i {
+						disk_map2[k] = -1
+					}
+				}
+
+				disk_map2 = append(disk_map2[:j-last_gap_len], append(new_file, disk_map2[j:]...)...)
+				break
+			}
+
+		}
+	}
+
+	result_1 := int64(0)
 	for i, n := range disk_map {
 		if n != -1 {
-			result_1 += n * i
+			result_1 += int64(n) * int64(i)
+		}
+	}
+
+	result_2 := int64(0)
+	for i, n := range disk_map2 {
+		if n != -1 {
+			result_2 += int64(n) * int64(i)
 		}
 	}
 
 	// Part 1
 	fmt.Printf("Part 1: %v\n", result_1)
-	fmt.Printf("Part 1: %v\n", disk_map)
-	fmt.Printf("Part 1: %v\n", disk_map2)
-	fmt.Printf("Part 1: %v\n", files)
 
 	// Part 2
-	// fmt.Printf("Part 2: %v\n", len(antinodes2))
+	fmt.Printf("Part 2: %v\n", result_2)
 
 	elapsed := time.Since(start)
 	fmt.Printf("\n\nExecution time: %s\n", elapsed)
