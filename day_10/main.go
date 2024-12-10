@@ -12,7 +12,6 @@ func main() {
 	file, _ := os.ReadFile("day_10/input.txt")
 
 	queue := [][3]int{}
-	// visited := make(map[[2]int]int)
 	starting_pos := [][2]int{}
 	ending_pos := [][2]int{}
 	lines := strings.Split(string(file), "\n")
@@ -21,7 +20,6 @@ func main() {
 		for x, rune := range line {
 			if rune == '0' {
 				queue = append(queue, [3]int{x, y, c})
-				// visited[[2]int{x, y}] = 1
 				starting_pos = append(starting_pos, [2]int{x, y})
 				c++
 			}
@@ -39,7 +37,6 @@ func main() {
 		curr_y := queue[i][1]
 		curr_start := queue[i][2]
 
-		// fmt.Printf("lines: %q\n", lines[curr_y][curr_x])
 		if lines[curr_y][curr_x] == '9' {
 			break
 		}
@@ -60,20 +57,13 @@ func main() {
 			}
 		}
 		queue = append(queue[1:], next_cells...)
-		// i++
 	}
 
-	// for i := 0; i < len(lines)-1; i++ {
-	// 	fmt.Printf("%v\n", lines[i])
-	// }
-
 	// Part 1
-	// fmt.Printf("queue: %v\n", queue)
-	// fmt.Printf("visited: %v\n", len(queue))
 	fmt.Printf("Part 1: %v\n", len(finish_map))
 
 	// Part 2
-	// fmt.Printf("Part 2: %v\n", result_2)
+	fmt.Printf("Part 2: %v\n", len(queue))
 
 	elapsed := time.Since(start)
 	fmt.Printf("\n\nExecution time: %s\n", elapsed)
