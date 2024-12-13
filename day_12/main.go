@@ -17,6 +17,7 @@ func main() {
 	field := []map[[2]int]bool{}
 	visited := map[[2]int]int{}
 
+	// TODO: scanning algo avec 4 bool pour les directions, parsing du field en checkant les bool + la contiguité
 	directions := [][2]int{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}
 	for y_ori, line := range lines {
 		for x_ori, plant := range line {
