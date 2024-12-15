@@ -101,7 +101,7 @@ func convertMatchesToIntegers(matches []string) ([]int64, error) {
 	return integers, nil
 }
 
-func findTheSolutions(a, b, c int64) *[2]int64 {
+func findTheSolutions(a, b, c int64) *[2]float64 {
 	gcd, x0, y0 := extendedGCD(a, b)
 
 	coeff := c / gcd
@@ -132,7 +132,7 @@ func findTheSolutions(a, b, c int64) *[2]int64 {
 		y := y0 - k*(a/gcd)
 
 		if x >= 0 && y >= 0 && x <= 100 && y <= 100 {
-			return &[2]int64{x, y}
+			return &[2]float64{float64(x), float64(y)}
 		}
 		k += count
 	}
@@ -146,15 +146,16 @@ func isWhole(x float64) bool {
 
 func systemSolver(ax, bx, ap, ay, by, bp float64) *[2]float64 {
 	// determiant := (by - (bx*ay)/ax)
-	// if determiant == 0 {
-	// 	test := findTheSolutions(int(ax), int(bx), int(ap))
-	// 	// println(int(ax), int(bx), int(ap))
-	// 	if test != nil {
-	// 		return test
-	// 	} else {
-	// 		return findTheSolutions(int(bx), int(by), int(bp))
-	// 	}
-	// }
+	determiant := (bx*ay - by*ax)
+	if determiant == 0 {
+		test := findTheSolutions(int64(ax), int64(bx), int64(ap))
+		// println(int(ax), int(bx), int(ap))
+		if test != nil {
+			return test
+		} else {
+			return findTheSolutions(int64(bx), int64(by), int64(bp))
+		}
+	}
 	// x := (bp - (ap * ay / ax)) / determiant
 	x := (bx*bp - by*ap) / (bx*ay - by*ax)
 	// println(int(bx), int(bp), int(by), int(ap), int(bx), int(ay), int(by), int(ax), int(x), int((bx*ay - by*ax)), int((bx*bp - by*ap)))
