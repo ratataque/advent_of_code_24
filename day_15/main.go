@@ -3,64 +3,29 @@ package main
 import (
 	"fmt"
 	"os"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
-	// "strings"
 )
 
-type coord struct {
-	pos  [2]int
-	velo [2]int
-}
+func canMove(grid [][]byte, current_pos [2]int, direction [2]int) bool {
 
-func ParseData(input string) ([]coord, error) {
-	re := regexp.MustCompile(`p=(-?\d+),(-?\d+) v=(-?\d+),(-?\d+)`)
-	// fmt.Printf("input: %v\n", input)
+	queue := [][2]int{current_pos}
+	for len(queue) > 0 {
+		next_pos := [2]int{queue[0][0] + direction[0], queue[0][1] + direction[1]}
+		current_char := grid[queue[0][1]][queue[0][0]]
 
-	matches := re.FindAllStringSubmatch(input, -1)
-
-	if matches == nil {
-		return nil, fmt.Errorf("no valid data found in input")
-	}
-
-	var results []coord
-
-	for _, match := range matches {
-		coords, err := convertMatchesToIntegers(match[1:])
-		if err != nil {
-			return nil, err
+		if current_char == '[' {
+			queue = append(queue, next_pos)
+			queue = append(queue, [2]int{next_pos[0] + 1, next_pos[1]})
+		} else if current_char == ']' {
+			queue = append(queue, next_pos)
+			queue = append(queue, [2]int{next_pos[0] - 1, next_pos[1]})
+		} else if current_char == '#' {
+			return false
 		}
-
-		results = append(results, coord{
-			pos:  [2]int{coords[0], coords[1]},
-			velo: [2]int{coords[2], coords[3]},
-		})
+		queue = queue[1:]
 	}
-
-	return results, nil
-}
-
-func abs(x int64) int64 {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-func convertMatchesToIntegers(matches []string) ([]int, error) {
-	integers := make([]int, len(matches))
-
-	for i, match := range matches {
-		num, err := strconv.Atoi(match)
-		if err != nil {
-			return nil, fmt.Errorf("error converting %s to integer: %v", match, err)
-		}
-		integers[i] = num
-	}
-
-	return integers, nil
+	return true
 }
 
 func move(grid [][]byte, current_pos [2]int, direction [2]int, entity byte) [2]int {
@@ -71,7 +36,6 @@ func move(grid [][]byte, current_pos [2]int, direction [2]int, entity byte) [2]i
 	if *next_char == '.' {
 		*next_char = entity
 		*current_char = '.'
-
 		return new_pos
 
 	} else if *next_char == 'O' {
@@ -94,6 +58,29 @@ func move(grid [][]byte, current_pos [2]int, direction [2]int, entity byte) [2]i
 				return new_pos
 			}
 
+		} else {
+			if *next_char == '[' {
+				if canMove(grid, new_pos, direction) {
+					move(grid, new_pos, direction, *next_char)
+					move(grid, [2]int{new_pos[0] + 1, new_pos[1]}, direction, ']')
+
+					*next_char = entity
+					*current_char = '.'
+
+					return new_pos
+				}
+			} else if *next_char == ']' {
+				if canMove(grid, new_pos, direction) {
+					move(grid, new_pos, direction, *next_char)
+					move(grid, [2]int{new_pos[0] - 1, new_pos[1]}, direction, '[')
+
+					*next_char = entity
+					*current_char = '.'
+
+					return new_pos
+				}
+			}
+
 		}
 	}
 
@@ -107,10 +94,6 @@ func main() {
 
 	grid := strings.Split(input[0], "\n")
 	instructions := input[1]
-
-	// for _, line := range grid {
-	// 	fmt.Printf("%v\n", line)
-	// }
 
 	grid_bytes := [][]byte{}
 	for _, str := range grid {
@@ -136,12 +119,6 @@ func main() {
 		}
 		grid_bytes_2 = append(grid_bytes_2, line_bytes)
 	}
-
-	for _, line := range grid_bytes_2 {
-		fmt.Printf("%q\n", line)
-	}
-
-	// fmt.Printf("%v\n", instructions)
 
 	starting_pos := [2]int{0, 0}
 	for y := 0; y < len(grid_bytes)-1; y++ {
@@ -172,20 +149,17 @@ func main() {
 	for _, instruction := range instructions {
 		if direction, exists := directions[instruction]; exists {
 			current_pos = move(grid_bytes, current_pos, direction, '@')
-			//
 			// for _, line := range grid_bytes {
 			// 	fmt.Printf("%q\n", line)
 			// }
 		}
 	}
-	// fmt.Printf("starting_pos_2: %v\n", starting_pos_2)
 
 	current_pos_2 := starting_pos_2
 	for _, instruction := range instructions {
 		if direction, exists := directions[instruction]; exists {
 			current_pos_2 = move(grid_bytes_2, current_pos_2, direction, '@')
-			//
-			// for _, line := range grid_bytes {
+			// for _, line := range grid_bytes_2 {
 			// 	fmt.Printf("%q\n", line)
 			// }
 		}
@@ -200,14 +174,26 @@ func main() {
 		}
 	}
 
+	GPS_2 := 0
+	for y, line := range grid_bytes_2 {
+		for x, char := range line {
+			if char == '[' {
+				GPS_2 += y*100 + x
+			}
+		}
+	}
+
 	// Part 1
 	fmt.Printf("Part 1: %v\n", GPS_1)
-	// for _, line := range grid_bytes_2 {
+	// for _, line := range grid_bytes {
 	// 	fmt.Printf("%q\n", line)
 	// }
 
 	// Part 2
-	// fmt.Printf("Part 2: %v\n", best_secondes)
+	fmt.Printf("Part 2: %v\n", GPS_2)
+	// for _, line := range grid_bytes_2 {
+	// 	fmt.Printf("%q\n", line)
+	// }
 
 	elapsed := time.Since(start)
 	fmt.Printf("\n\nExecution time: %s\n", elapsed)
