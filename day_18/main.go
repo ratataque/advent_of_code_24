@@ -29,7 +29,4 @@ func main() {
 	res_two := solution.PartTwo(input, "real")
 	fmt.Println("Result 1:", res_one)
 	fmt.Println("Result 2:", res_two)
-
-	// resTwo := solution.PartTwo(inp)
-	// log.Println("Result two", resTwo)
 }

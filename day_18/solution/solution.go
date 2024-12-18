@@ -28,13 +28,8 @@ func PartOne(input []Coord, test string) int {
 		grid[coord.Y][coord.X] = '#'
 	}
 
-	// for _, row := range grid {
-	// 	fmt.Printf("%q\n", row)
-	// }
-
 	step := bfs(grid, Coord{0, 0}, Coord{grid_size - 1, grid_size - 1})
 
-	// fmt.Printf("step total: %v\n", step)
 	return step
 }
 
