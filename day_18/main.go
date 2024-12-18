@@ -23,11 +23,12 @@ func main() {
 		log.Fatal(fmt.Sprintf("Failed to read input %v\n", err))
 	}
 
-	// fmt.Printf("input: %v\n", input[0].X)
-
 	// res_one := solution.PartOne(input, "test")
 	res_one := solution.PartOne(input, "real")
-	fmt.Println("Part 1:", res_one)
+	// res_two := solution.PartTwo(input, "test")
+	res_two := solution.PartTwo(input, "real")
+	fmt.Println("Result 1:", res_one)
+	fmt.Println("Result 2:", res_two)
 
 	// resTwo := solution.PartTwo(inp)
 	// log.Println("Result two", resTwo)

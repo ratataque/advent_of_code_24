@@ -1,15 +1,19 @@
 package solution
 
 import (
-	"fmt"
+	// "fmt"
 	"time"
 )
 
 func PartOne(input []Coord, test string) int {
+	defer Track(time.Now(), "Part 1")
+
 	grid_size := 71
 	if test == "test" {
 		grid_size = 7
 	}
+
+	input = input[:1024]
 
 	grid := make([][]byte, grid_size)
 
@@ -24,18 +28,58 @@ func PartOne(input []Coord, test string) int {
 		grid[coord.Y][coord.X] = '#'
 	}
 
-	for _, row := range grid {
-		fmt.Printf("%q\n", row)
-	}
+	// for _, row := range grid {
+	// 	fmt.Printf("%q\n", row)
+	// }
 
 	step := bfs(grid, Coord{0, 0}, Coord{grid_size - 1, grid_size - 1})
 
-	fmt.Printf("step total: %v\n", step)
-	return 0
+	// fmt.Printf("step total: %v\n", step)
+	return step
+}
+
+func PartTwo(input []Coord, test string) Coord {
+	defer Track(time.Now(), "Part 2")
+
+	grid_size := 71
+	initial_input := input[:12]
+	other_input := input[12:]
+	// input = input[:1024]
+
+	if test == "test" {
+		grid_size = 7
+	} else {
+		initial_input = input[:1024]
+	}
+
+	grid := make([][]byte, grid_size)
+
+	for i := range grid {
+		grid[i] = make([]byte, grid_size)
+		for j := range grid[i] {
+			grid[i][j] = '.'
+		}
+	}
+
+	for _, coord := range initial_input {
+		grid[coord.Y][coord.X] = '#'
+	}
+
+	coord := Coord{0, 0}
+	for _, curr_coord := range other_input {
+		grid[curr_coord.Y][curr_coord.X] = '#'
+		step := bfs(grid, Coord{0, 0}, Coord{grid_size - 1, grid_size - 1})
+		if step == -1 {
+			coord = curr_coord
+			break
+		}
+	}
+
+	// fmt.Printf("step total: %v\n", step)
+	return coord
 }
 
 func bfs(grid [][]byte, start Coord, end Coord) int {
-	defer Track(time.Now(), "bfs")
 
 	visited := make(map[Coord]bool)
 	queue := []struct {
