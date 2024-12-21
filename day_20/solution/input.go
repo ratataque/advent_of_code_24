@@ -7,11 +7,17 @@ import (
 )
 
 type Coord struct {
-	x int
-	y int
+	X int
+	Y int
 }
 
-func ReadInput(file_path string) ([][]byte, Coord, Coord) {
+type Grid struct {
+	Data          [][]byte
+	Width, Height int
+	Start, End    Coord
+}
+
+func ReadInput(file_path string) *Grid {
 	defer Track(time.Now(), "Input Parsed in")
 
 	file, _ := os.Open(file_path)
@@ -31,11 +37,18 @@ func ReadInput(file_path string) ([][]byte, Coord, Coord) {
 			if char == 'S' {
 				start_pos = Coord{x, y}
 			} else if char == 'E' {
-				end_pos = Coord{7, 8}
+				end_pos = Coord{x, y}
 			}
 		}
 		y++
 	}
 
-	return grid, start_pos, end_pos
+	g := &Grid{
+		Data:   grid,
+		Width:  len(grid[0]),
+		Height: len(grid),
+		Start:  start_pos,
+		End:    end_pos}
+
+	return g
 }
