@@ -1,73 +1,207 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
-	"os"
+	"sort"
 	"strings"
-	"time"
+	"testing"
 )
 
-func main() {
-	start := time.Now()
-	file, _ := os.ReadFile("day_12/input.txt")
+//go:embed input.txt
+var input string
 
-	lines := strings.Split(string(file), "\n")
-	lines = lines[:len(lines)-1]
+// //go:embed sample.txt
+// var sample string
+//
+// //go:embed sample2.txt
+// var sample2 string
+//
+// //go:embed sample3.txt
+// var sample3 string
+//
+// //go:embed sample4.txt
+// var sample4 string
+//
+// //go:embed sample5.txt
+// var sample5 string
 
-	field := []map[[2]int]bool{}
-	visited := map[[2]int]int{}
+func TestSolution(t *testing.T) {
+	type test struct {
+		name            string
+		input           string
+		expectedPartOne int
+		expectedPartTwo int
+	}
 
-	// TODO: scanning algo avec 4 bool pour les directions, parsing du field en checkant les bool + la contiguité
-	directions := [][2]int{{0, 1}, {0, -1}, {1, 0}, {-1, 0}}
-	for y_ori, line := range lines {
-		for x_ori, plant := range line {
-			if _, existe := visited[[2]int{x_ori, y_ori}]; !existe {
-				visited[[2]int{x_ori, y_ori}] = 4
+	tests := []test{
+		// {
+		// 	name:            "with sample 1",
+		// 	input:           sample,
+		// 	expectedPartOne: 140,
+		// 	expectedPartTwo: 80,
+		// }, {
+		// 	name:            "with sample 2",
+		// 	input:           sample2,
+		// 	expectedPartOne: 772,
+		// 	expectedPartTwo: 436,
+		// }, {
+		// 	name:            "with sample 3",
+		// 	input:           sample3,
+		// 	expectedPartOne: 1930,
+		// 	expectedPartTwo: 1206,
+		// }, {
+		// 	name:            "with sample 4",
+		// 	input:           sample4,
+		// 	expectedPartOne: -1,
+		// 	expectedPartTwo: 236,
+		// }, {
+		// 	name:            "with sample 5",
+		// 	input:           sample5,
+		// 	expectedPartOne: -1,
+		// 	expectedPartTwo: 368,
+		{
+			name:            "with large input",
+			input:           input,
+			expectedPartOne: 0,
+			expectedPartTwo: 0,
+		},
+	}
 
-				queue := [][2]int{{x_ori, y_ori}}
-				region := map[[2]int]bool{{x_ori, y_ori}: true}
-				for len(queue) > 0 {
-					for dir := range directions {
-						x, y := queue[0][0], queue[0][1]
-						new_x := x + directions[dir][0]
-						new_y := y + directions[dir][1]
-
-						if new_x >= 0 && new_x < len(lines[y]) && new_y >= 0 && new_y < len(lines) {
-							if []rune(lines[new_y])[new_x] == plant {
-								if _, test := visited[[2]int{new_x, new_y}]; !test {
-									visited[[2]int{new_x, new_y}] = 4
-									visited[[2]int{x, y}]--
-									region[[2]int{new_x, new_y}] = true
-									queue = append(queue, [2]int{new_x, new_y})
-
-								} else {
-									visited[[2]int{x, y}]--
-								}
-							}
-						}
-					}
-					queue = queue[1:]
+	for _, tst := range tests {
+		t.Run(tst.name, func(t *testing.T) {
+			farm := parseInput(tst.input)
+			if tst.expectedPartOne != -1 {
+				if got := partOne(farm); got != tst.expectedPartOne {
+					t.Errorf("partOne() = %v, want %v", got, tst.expectedPartOne)
 				}
-				field = append(field, region)
+			}
+
+			if tst.expectedPartTwo != -1 {
+				if got := partTwo(farm); got != tst.expectedPartTwo {
+					t.Errorf("partTwo() = %v, want %v", got, tst.expectedPartTwo)
+				}
+			}
+		})
+
+	}
+
+}
+
+func parseInput(input string) [][]byte {
+	lines := strings.Split(input, "\n")
+	farm := make([][]byte, len(lines))
+	for i, line := range lines {
+		farm[i] = []byte(line)
+	}
+	return farm
+}
+
+func dfs(farm [][]byte, visited [][]bool, i, j int, sides *[][3]int) (int, int) {
+
+	visited[i][j] = true
+	neighbors := getNeighbors(i, j)
+	perimeter := 0
+	area := 1
+	for _, n := range neighbors {
+		ni, nj := n[0], n[1]
+		if ni < 0 || ni >= len(farm) || nj < 0 || nj >= len(farm[ni]) || farm[ni][nj] != farm[i][j] {
+			if sides != nil {
+				*sides = append(*sides, [3]int{ni, nj, n[2]})
+			}
+			perimeter++
+		} else if !visited[ni][nj] {
+			a, p := dfs(farm, visited, ni, nj, sides)
+			area += a
+			perimeter += p
+		}
+	}
+	return area, perimeter
+}
+
+func getNeighbors(i, j int) [][3]int {
+	return [][3]int{
+		{i - 1, j, 0},
+		{i + 1, j, 1},
+		{i, j - 1, 2},
+		{i, j + 1, 3},
+	}
+}
+
+func partOne(farm [][]byte) int {
+	visited := make([][]bool, len(farm))
+	for i := range visited {
+		visited[i] = make([]bool, len(farm[i]))
+	}
+	sum := 0
+	for i := 0; i < len(farm); i++ {
+		for j := 0; j < len(farm[i]); j++ {
+			if !visited[i][j] {
+				area, perimeter := dfs(farm, visited, i, j, nil)
+				//fmt.Printf("Char: %s = Area: %d, Perimeter: %d\n", string(farm[i][j]), area, perimeter)
+				sum += area * perimeter
 			}
 		}
 	}
+	return sum
+}
 
-	total_1 := 0
-	for _, region := range field {
-		fence := 0
-		for plant := range region {
-			fence += visited[plant]
+func getSideCount(sides [][3]int) int {
+	sideMap := make(map[[3]int]bool)
+
+	sort.Slice(sides, func(i, j int) bool {
+		if sides[i][0] == sides[j][0] {
+			return sides[i][1] < sides[j][1]
 		}
-		total_1 += fence * len(region)
+		return sides[i][0] < sides[j][0]
+	})
+
+	//fmt.Println(sides)
+
+	sideCount := 0
+
+	for _, s := range sides {
+		getCombinations := getNeighbors(s[0], s[1])
+		combFound := false
+
+		for _, c := range getCombinations {
+			c[2] = s[2]
+			if _, found := sideMap[c]; found {
+				combFound = true
+			}
+		}
+		if !combFound {
+			sideCount++
+		}
+
+		sideMap[s] = true
+
 	}
 
-	// Part 1
-	fmt.Printf("Part 1: %v\n", total_1)
+	return sideCount
+}
 
-	// Part 2
-	// fmt.Printf("Part 2: %v\n", total_2)
+func partTwo(farm [][]byte) int {
+	visited := make([][]bool, len(farm))
+	for i := range visited {
+		visited[i] = make([]bool, len(farm[i]))
+	}
+	sum := 0
+	for i := 0; i < len(farm); i++ {
+		for j := 0; j < len(farm[i]); j++ {
+			if !visited[i][j] {
+				sides := make([][3]int, 0)
+				area, _ := dfs(farm, visited, i, j, &sides)
+				sideCount := getSideCount(sides)
+				//fmt.Printf("Char: %s = Area: %d, Sides: %d\n", string(farm[i][j]), area, sideCount)
+				sum += area * sideCount
+			}
+		}
+	}
+	return sum
+}
 
-	elapsed := time.Since(start)
-	fmt.Printf("\n\nExecution time: %s\n", elapsed)
+func main() {
+	fmt.Println(partOne(parseInput(input)))
+	fmt.Println(partTwo(parseInput(input)))
 }
