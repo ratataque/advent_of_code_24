@@ -1,7 +1,6 @@
 package solution
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -169,17 +168,15 @@ func Part_One(computer_list [][]string) int {
 	triplets := findTriplets(graph)
 	result := countTripletsWithT(triplets)
 
-	// fmt.Printf("connected: %v\n", graph)
-	// fmt.Printf("connected: %v\n", triplets)
 	return result
 }
 
-func Part_Two(computer_list [][]string) int {
+func Part_Two(computer_list [][]string) string {
 	defer Track(time.Now(), "Part 2")
 
 	graph := buildGraph(computer_list)
 	clique := findMaximumClique(graph)
+	password := getPassword(clique)
 
-	fmt.Printf("clique: %v\n", clique)
-	return 0
+	return password
 }
