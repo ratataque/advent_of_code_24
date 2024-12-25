@@ -20,7 +20,7 @@ func ParseInput(name string) ([]Key, []Lock) {
 
 	for scanner.Scan() {
 		curr := make([]int, 5)
-		isLock := false
+		is_lock := false
 		for i := 0; i < 7; i++ {
 			for c, char := range scanner.Text() {
 				if char == '#' {
@@ -28,7 +28,7 @@ func ParseInput(name string) ([]Key, []Lock) {
 				}
 			}
 			if i == 0 && slices.Equal(curr, []int{1, 1, 1, 1, 1}) {
-				isLock = true
+				is_lock = true
 			}
 			scanner.Scan()
 		}
@@ -36,7 +36,7 @@ func ParseInput(name string) ([]Key, []Lock) {
 		for i := range curr {
 			curr[i]--
 		}
-		if isLock {
+		if is_lock {
 			locks = append(locks, curr)
 		} else {
 			keys = append(keys, curr)
